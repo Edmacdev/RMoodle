@@ -15,12 +15,15 @@ import { AppComponent } from './app.component';
 import { FuseMainModule } from './main/main.module';
 import { FuseSampleModule } from './main/content/sample/sample.module';
 
-import { AuthService } from '@fuse/services/auth.service';
+import { AuthService } from './main/services/auth.service';
+import { MoodleService } from './main/services/moodle.service';
+import { MoodleApiService } from './main/services/moodle-api.service';
 
 import { AngularFireModule  } from 'angularfire2';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { AngularFirestoreModule } from 'angularfire2/firestore';
 import { AngularFireStorageModule } from 'angularfire2/storage';
+
 
 import { environment } from '../environments/environment';
 
@@ -32,6 +35,14 @@ const appRoutes: Routes = [
   {
       path      : 'dashboard',
       loadChildren: './main/content/components/dashboard/dashboard.module#DashboardModule'
+  },
+  {
+      path      : 'moodles',
+      loadChildren: './main/content/components/moodles/moodles.module#MoodlesModule'
+  },
+  {
+      path      : 'courses',
+      loadChildren: './main/content/components/courses/courses.module#CoursesModule'
   },
     {
         path      : '**',
@@ -62,11 +73,18 @@ const appRoutes: Routes = [
         AngularFireStorageModule // imports firebase/storage only needed for storage features
     ],
     providers   :[
-      AuthService
+      AuthService,
+      MoodleService,
+      MoodleApiService
     ],
     bootstrap   : [
         AppComponent
     ]
+    // entryComponents:  [
+    //   EditMoodleDialogComponent,
+    //   RemoveMoodleDialogComponent,
+    //   AddMoodleDialogComponent
+    // ]
 })
 export class AppModule
 {

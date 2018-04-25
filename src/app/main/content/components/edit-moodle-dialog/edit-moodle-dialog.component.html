@@ -1,0 +1,22 @@
+<div class="">
+  <h2 mat-dialog-title>Editar {{data.name}}</h2>
+  <hr>
+  <mat-dialog-content>
+    <form [formGroup]="fg_edit_moodle">
+      <mat-form-field>
+        <input formControlName="name" [(ngModel)]="form_name" matInput type="text" class="addText" placeholder="Nome do moodle" value="{{data.name}}">
+      </mat-form-field>
+      <mat-form-field>
+        <input formControlName="url" [(ngModel)]="form_url" matInput type="url"  class="addText" placeholder="Endereço do moodle" value="{{data.url}}">
+      </mat-form-field>
+      <mat-form-field>
+        <input formControlName="token" [(ngModel)]="form_token" matInput type="text"  class="addText" placeholder="Token" value="{{data.token}}">
+      </mat-form-field>
+    </form>
+  </mat-dialog-content>
+  <hr>
+  <mat-dialog-actions>
+    <button mat-raised-button color="primary" (click)="onCloseConfirm()" [disabled]="!fg_edit_moodle.valid">Confirmar</button>
+    <button mat-raised-button color="warn" (click)="onCloseCancel()" >Cancelar</button>
+  </mat-dialog-actions>
+</div>

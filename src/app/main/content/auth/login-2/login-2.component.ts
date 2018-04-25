@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FuseConfigService } from '@fuse/services/config.service';
 import { fuseAnimations } from '@fuse/animations';
 
-import { AuthService } from '@fuse/services/auth.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
     selector   : 'fuse-login-2',

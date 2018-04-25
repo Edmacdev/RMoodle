@@ -1,0 +1,13 @@
+<div class="">
+
+  <h2 mat-dialog-title> <mat-icon class="i-warning">warning</mat-icon>Remover {{data.name}}</h2>
+  <hr>
+  <mat-dialog-content>
+    <p><strong>Você tem certeza que deseja remover o moodle {{data.name}}?</strong></p>
+  </mat-dialog-content>
+  <hr>
+  <mat-dialog-actions>
+    <button mat-raised-button color="primary" (click)="onCloseConfirm()" >Confirmar</button>
+    <button mat-raised-button color="warn" (click)="onCloseCancel()" >Cancelar</button>
+  </mat-dialog-actions>
+</div>

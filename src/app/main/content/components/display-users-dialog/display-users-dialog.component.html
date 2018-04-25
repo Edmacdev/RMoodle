@@ -1,0 +1,28 @@
+<div>
+  <h2 mat-dialog-title>{{data.name}}</h2>
+  <hr>
+  <mat-dialog-content>
+    <br>
+    <br>
+    <div>
+      <p><strong>Relatório: </strong></p>
+      <ul>
+        <li *ngFor="let course of data.courses; let i = index">
+
+          <p><strong>Curso:</strong> {{course.fullname}}</p>
+          <p><strong>Nota:</strong> {{getCourseGrade(course.id)}}</p>
+          <br>
+        </li>
+      </ul>
+    </div>
+    <div *ngIf="data.courses == 0">
+      <p>Usuário não está matriculado em nenhum curso</p>
+    </div>
+
+
+  </mat-dialog-content>
+  <hr>
+  <mat-dialog-actions>
+    <button mat-rased-button (click)="onCloseConfirm()">CONFIRMAR</button>
+  </mat-dialog-actions>
+</div>

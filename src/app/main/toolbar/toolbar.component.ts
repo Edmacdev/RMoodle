@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 
 import { FuseConfigService } from '@fuse/services/config.service';
 import { FuseSidebarService } from '@fuse/components/sidebar/sidebar.service';
+
+import { AuthService } from  '../services/auth.service';
 
 @Component({
     selector   : 'fuse-toolbar',
@@ -11,7 +13,7 @@ import { FuseSidebarService } from '@fuse/components/sidebar/sidebar.service';
     styleUrls  : ['./toolbar.component.scss']
 })
 
-export class FuseToolbarComponent
+export class FuseToolbarComponent implements OnInit
 {
     userStatusOptions: any[];
     languages: any;
@@ -20,11 +22,14 @@ export class FuseToolbarComponent
     horizontalNav: boolean;
     noNav: boolean;
 
+    user: any = {};
+
     constructor(
         private router: Router,
         private fuseConfig: FuseConfigService,
         private sidebarService: FuseSidebarService,
-        private translate: TranslateService
+        private translate: TranslateService,
+        private authService: AuthService
     )
     {
         this.userStatusOptions = [
@@ -88,7 +93,15 @@ export class FuseToolbarComponent
         });
 
     }
-
+    ngOnInit()
+    {
+    this.authService.user.subscribe(
+      user => {
+        this.user = user
+        console.log(this.user)
+      }
+    )
+  }
     toggleSidebarOpened(key)
     {
         this.sidebarService.getSidebar(key).toggleOpen();

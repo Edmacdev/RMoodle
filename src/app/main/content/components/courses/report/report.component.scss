@@ -1,0 +1,187 @@
+
+h2{
+  text-align: center;
+  width: 100%
+}
+.report{
+  text-align: center;
+}
+.topbar{
+  background: #F8F8FA;
+}
+.title{
+  margin-top: 50px;
+  text-align: center;
+}
+.chart{
+  margin-top: 30px;
+  margin-bottom: 50px;
+}
+.mat-form{
+  margin-right: 65px;
+  margin-left: 15px;
+}
+.select{
+  text-align: center;
+}
+.users-container {
+  position: absolute;
+  top: 60px;
+  bottom: 60px;
+  left: 0;
+  right: 0;
+}
+
+.tabs{
+  min-height: 500px;
+  width: 100%;
+
+}
+.list{
+  // overflow: auto;
+}
+#tb-users{
+  width: 100%;
+}
+//COUNTDOWN
+ul.countdown {
+  list-style: none;
+  margin: 75px 0;
+  padding: 0;
+  display: block;
+  text-align: center;
+}
+
+ul.countdown li { display: inline-block; }
+
+ul.countdown li span {
+  font-size: 80px;
+  font-weight: 300;
+  line-height: 80px;
+  padding: 0 20px;
+  border-top: 1px solid #C0392B;
+  border-bottom: 1px solid #C0392B;
+  margin-left: -4px;
+}
+
+ul.countdown li p {
+  color: #333;
+  font-size: 14px;
+  text-transform: uppercase;
+  margin-top: 10px;
+}
+
+.days {
+  background-color: #C0392B;
+  padding: 0 10px;
+  color: #fff;
+}
+
+.last { border-right: 1px solid #C0392B; }
+
+/* Structure */
+
+
+.example-header {
+  min-height: 64px;
+  padding: 8px 24px 0;
+
+}
+
+.filter {
+  font-size: 14px;
+  width: 100%;
+}
+
+.mat-table {
+  min-height: 550px;
+  // overflow: auto;
+}
+
+.info{
+  margin-bottom: 150px;
+  width: 100%
+}
+
+.editable{
+  outline: none;
+  -webkit-appearance: none;
+  border: 0px;
+
+}
+.input-title{
+  text-align: center;
+  width: 100%;
+}
+.user-info{
+  background-color: rgba(0,0,0,0)
+}
+.input-title:focus,
+.user-info:focus{
+  box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+  padding: 3px 0px 3px 3px;
+  margin: 5px 1px 3px 0px;
+  border: 1px solid rgba(81, 203, 238, 1);
+}
+.course-info{
+  text-align: center;
+}
+.icon-print{
+  float: right;
+  font-size: 24px;
+  cursor: pointer;
+}
+.mat-cell, .mat-header-cell{
+  flex:1;
+}
+.col-risk{
+  flex:0.5 !important;
+}
+.col-name{
+  flex: 1.5 !important;
+}
+.mat-cell input{
+  width: 100%;
+}
+.col-email{
+  flex: 1.5 !important;
+}
+.col-lastaccess{
+  flex:0.5 !important;
+}
+.col-progress{
+  flex:0.5 !important;
+}
+.col-grade{
+  flex:0.5 !important;
+}
+.col-options{
+  flex:0.5 !important;
+}
+// .firstname{
+//   flex:0.5 !important;
+// }
+// .lastname{
+//   flex:0.5 !important;
+// }
+.icon-remove-circle{
+  margin-left: 10px;
+  font-size: 24px;
+}
+.icon-remove-circle:hover{
+  color: red;
+}
+.icon{
+  cursor: pointer;
+}
+.user-element{
+  display: flex;
+}
+.user-element h4, .user-element p{
+  // float: left;
+  flex: 2;
+  margin: 10px 25px 10px 0px;
+}
+.user-element h4{
+
+}
