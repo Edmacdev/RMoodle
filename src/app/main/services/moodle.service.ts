@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection } from 'angularfire2/firestore';
-import { Moodle } from '../models/Moodle'; 
+import { Moodle } from '../models/Moodle';
 import { Observable } from 'rxjs/Observable';
 
 @Injectable()
@@ -56,12 +56,12 @@ export class MoodleService {
     return userRef.set(moodle)
   }
   getDefaultMoodle(uid: string){
-    return this.afStore.collection('Usuários/' + uid + '/DefaultMoodle').snapshotChanges().map(
+    return this.afStore.collection('Usuários/' + uid + '/DefaultMoodle').snapshotChanges()
+    .map(
       changes => {
         return changes.map(
           res => {
             const data = res.payload.doc.data() as Moodle;
-            data.id = res.payload.doc.id;
             return data;
           }
         )

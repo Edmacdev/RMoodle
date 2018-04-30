@@ -1,0 +1,111 @@
+.editable{
+  outline: none;
+  -webkit-appearance: none;
+  border: 0px;
+
+}
+.input-title{
+  text-align: center;
+  width: 100%;
+}
+//COUNTDOWN
+ul.countdown {
+  list-style: none;
+  margin: 75px 0;
+  padding: 0;
+  display: block;
+  text-align: center;
+}
+
+ul.countdown li { display: inline-block; }
+
+ul.countdown li span {
+  font-size: 80px;
+  font-weight: 300;
+  line-height: 80px;
+  padding: 0 20px;
+  border-top: 1px solid #C0392B;
+  border-bottom: 1px solid #C0392B;
+  margin-left: -4px;
+}
+
+ul.countdown li p {
+  color: #333;
+  font-size: 14px;
+  text-transform: uppercase;
+  margin-top: 10px;
+}
+
+.days {
+  background-color: #C0392B;
+  padding: 0 10px;
+  color: #fff;
+}
+
+.last { border-right: 1px solid #C0392B; }
+
+.info{
+  margin-bottom: 150px;
+  width: 100%
+}
+.mat-table {
+  min-height: 550px;
+}
+.table-header {
+  min-height: 64px;
+  padding: 8px 24px 0;
+}
+.filter {
+  font-size: 14px;
+  width: 100%;
+}
+.icon-print{
+  float: right;
+  font-size: 24px;
+  cursor: pointer;
+}
+.mat-cell, .mat-header-cell{
+  flex:1;
+}
+.col-risk{
+  flex:0.5 !important;
+}
+.col-name{
+  flex: 1.5 !important;
+}
+.mat-cell input{
+  width: 100%;
+}
+.col-email{
+  flex: 1.5 !important;
+}
+.col-lastaccess{
+  flex:0.5 !important;
+}
+.col-progress{
+  flex:0.5 !important;
+}
+.col-grade{
+  flex:0.5 !important;
+}
+.col-options{
+  flex:0.5 !important;
+}
+.icon-remove-circle{
+  margin-left: 10px;
+  font-size: 24px;
+}
+.icon-remove-circle:hover{
+  color: red;
+}
+.icon{
+  cursor: pointer;
+}
+.user-element{
+  display: flex;
+}
+.user-element h4, .user-element p{
+
+  flex: 2;
+  margin: 10px 25px 10px 0px;
+}

@@ -18,12 +18,15 @@ import { FuseSampleModule } from './main/content/sample/sample.module';
 import { AuthService } from './main/services/auth.service';
 import { MoodleService } from './main/services/moodle.service';
 import { MoodleApiService } from './main/services/moodle-api.service';
+import { DataShareService } from './main/services/data-share.service';
+
 
 import { AngularFireModule  } from 'angularfire2';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { AngularFirestoreModule } from 'angularfire2/firestore';
 import { AngularFireStorageModule } from 'angularfire2/storage';
 
+import { HttpModule } from '@angular/http';
 
 import { environment } from '../environments/environment';
 
@@ -70,21 +73,20 @@ const appRoutes: Routes = [
         AngularFireModule.initializeApp(environment.firebase),
         AngularFirestoreModule, // imports firebase/firestore, only needed for database features
         AngularFireAuthModule, // imports firebase/auth, only needed for auth features,
-        AngularFireStorageModule // imports firebase/storage only needed for storage features
+        AngularFireStorageModule, // imports firebase/storage only needed for storage features
+
+        HttpModule
     ],
     providers   :[
       AuthService,
       MoodleService,
-      MoodleApiService
+      MoodleApiService,
+      DataShareService
     ],
     bootstrap   : [
         AppComponent
     ]
-    // entryComponents:  [
-    //   EditMoodleDialogComponent,
-    //   RemoveMoodleDialogComponent,
-    //   AddMoodleDialogComponent
-    // ]
+
 })
 export class AppModule
 {

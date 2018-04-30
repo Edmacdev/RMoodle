@@ -1,4 +1,21 @@
 export const navigation = [
+  {
+      'id'      : 'dashboard',
+      'title'   : 'Dashboard',
+      'translate': 'Dashboard',
+      'type'    : 'group',
+      'children': [
+          {
+              'id'   : 'dashboard_analytics',
+              'title': 'Análise',
+              'translate': 'Análise',
+              'type' : 'item',
+              'icon' : 'dashboard',
+              'url'  : '/dashboard'
+
+          }
+      ]
+  },
     {
         'id'      : 'moodles',
         'title'   : 'Moodles',
@@ -23,12 +40,12 @@ export const navigation = [
         'type'    : 'group',
         'children': [
             {
-                'id'   : 'courses_report',
-                'title': 'Relatório',
-                'translate': 'Relatório',
+                'id'   : 'courses_monitor',
+                'title': 'Monitoramento',
+                'translate': 'Monitoriamento',
                 'type' : 'item',
                 'icon' : 'info',
-                'url'  : '/courses/report'
+                'url'  : '/courses'
 
             }
         ]
