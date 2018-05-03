@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { FuseConfigService } from '@fuse/services/config.service';
@@ -20,7 +22,8 @@ export class FuseLogin2Component implements OnInit
     constructor(
         private fuseConfig: FuseConfigService,
         private formBuilder: FormBuilder,
-        private authService: AuthService
+        private authService: AuthService,
+        private router: Router
     )
     {
         this.fuseConfig.setConfig({
@@ -39,6 +42,11 @@ export class FuseLogin2Component implements OnInit
 
     ngOnInit()
     {
+        this.authService.getUser().subscribe(
+          user => {
+            if(user){this.router.navigate(['dashboard']);}
+          }
+        );
         this.loginForm = this.formBuilder.group({
             email   : ['', [Validators.required, Validators.email]],
             password: ['', Validators.required]

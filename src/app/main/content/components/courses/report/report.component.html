@@ -14,103 +14,88 @@
     </div>
     <!-- / HEADER -->
     <!-- CONTENT -->
-    <div class="moodle-title">
-      <h1>Moodle {{current_moodle.name}}</h1>
-      <button mat-button color="accent">Alterar</button>
-    </div>
-    <div class="content p-24">
+    <div *ngIf="is_ready">
+      <div  class="moodle-title">
+        <h1>Moodle {{current_moodle.name}}</h1>
+        <button mat-button color="accent">Alterar</button>
+      </div>
+      <div class="content p-24">
 
-        <div fxLayout="column" fxLayoutAlign="center">
+          <div fxLayout="column" fxLayoutAlign="center">
 
-            <div class="filters" fxLayout="column" fxLayoutAlign="center center"
-                 fxLayout.gt-xs="row" fxLayoutAlign.gt-xs="space-between center">
+              <div class="filters" fxLayout="column" fxLayoutAlign="center center"
+                   fxLayout.gt-xs="row" fxLayoutAlign.gt-xs="space-between center">
 
-                <mat-form-field class="course-search">
+                  <mat-form-field class="course-search">
 
-                    <input matInput placeholder="Buscar um curso" [(ngModel)]="searchTerm"
-                           (input)="filterCoursesByTerm()">
+                      <input matInput placeholder="Buscar um curso" [(ngModel)]="search_term"
+                             (input)="filterCoursesByTerm()">
 
-                </mat-form-field>
+                  </mat-form-field>
 
-                <!-- <mat-form-field class="category-selector">
+                  <!-- <mat-form-field class="category-selector">
 
-                    <mat-select placeholder="Select Category" [(ngModel)]="currentCategory"
-                                (change)="filterCoursesByCategory()">
-                        <mat-option [value]="'all'">
-                            Todos
-                        </mat-option>
-                        <mat-option *ngFor="let category of categories" [value]="category.value">
-                            {{ category.label }}
-                        </mat-option>
-                    </mat-select>
+                      <mat-select placeholder="Select Category" [(ngModel)]="currentCategory"
+                                  (change)="filterCoursesByCategory()">
+                          <mat-option [value]="'all'">
+                              Todos
+                          </mat-option>
+                          <mat-option *ngFor="let category of categories" [value]="category.value">
+                              {{ category.label }}
+                          </mat-option>
+                      </mat-select>
 
-                </mat-form-field> -->
+                  </mat-form-field> -->
 
-            </div>
+              </div>
 
-            <div  class="courses" fxLayout="row wrap" fxLayoutAlign="center">
+              <div  class="courses" fxLayout="row wrap" fxLayoutAlign="center">
 
-                <div class="course" *ngFor="let course of courses" fxFlex="100" fxFlex.gt-xs="50"
-                     fxFlex.gt-sm="33" [ngClass]="course.category">
+                  <div class="course" *ngFor="let course of filteredCourses" fxFlex="100" fxFlex.gt-xs="50"
+                       fxFlex.gt-sm="33" [ngClass]="course.category">
 
-                    <div class="course-content" fxLayout="column">
+                      <div class="course-content" fxLayout="column">
 
-                        <!-- <div class="header" fxLayout="row" fxLayoutAlign="center center"> -->
-                             <!-- [ngClass]="course.category + '-bg'">
+                          <!-- <div class="header" fxLayout="row" fxLayoutAlign="center center"> -->
+                               <!-- [ngClass]="course.category + '-bg'">
 
-                            <div class="category" fxFlex>
-                                {{course.category}}
-                            </div>
+                              <div class="category" fxFlex>
+                                  {{course.category}}
+                              </div>
 
-                            <div class="length" fxLayout="row" fxLayoutAlign="center center">
-                                <mat-icon class="length-icon s-20">access_time</mat-icon>
-                                <div class="min">{{course.length}} min</div>
-                            </div>
+                              <div class="length" fxLayout="row" fxLayoutAlign="center center">
+                                  <mat-icon class="length-icon s-20">access_time</mat-icon>
+                                  <div class="min">{{course.length}} min</div>
+                              </div>
 
-                        </div> -->
+                          </div> -->
 
-                        <div class="content" fxLayout="column" fxLayoutAlign="center center" fxFlex>
-                            <div class="h1">{{course.displayname}}</div>
-                        </div>
+                          <div class="content" fxLayout="column" fxLayoutAlign="center center" fxFlex>
+                              <div class="h1">{{course.displayname}}</div>
+                          </div>
 
-                        <div class="footer" fxLayout="row" fxLayoutAlign="center center">
-                            <button mat-button color="accent" [routerLink]="'/courses/course/' + current_moodle.id + '/' + course.id" >
-                                Monitorar
-                            </button>
-                        </div>
+                          <div class="footer" fxLayout="row" fxLayoutAlign="center center">
+                              <button mat-button color="accent" [routerLink]="'/courses/course/' + current_moodle.id + '/' + course.id" >
+                                  Monitorar
+                              </button>
+                          </div>
 
-                    </div>
+                      </div>
 
-                </div>
+                  </div>
 
-                <div class="no-courses" *ngIf="courses.length === 0">
-                    No courses found!
-                </div>
+                  <div class="no-courses" *ngIf="!is_courses">
+                      Não há cursos
+                  </div>
 
-            </div>
+              </div>
 
-        </div>
+          </div>
 
-    </div>
-    <!-- /CONTENT  -->
-  <div class="topbar">
-    <div class="container">
-      <div class="row">
-        <form class="col-md-12 select" action="index.html">
-          <strong>Moodle:</strong>
-          <mat-form-field class="mat-form" >
-            <mat-select [(ngModel)]="current_moodle" name="current_moodle" (change)="getCourses()" [(value)]="value">
-              <mat-option *ngFor="let moodle of moodles let i = index" [value]="moodle.id">{{moodle.name}}</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <strong>Curso:</strong>
-          <mat-form-field class="mat-form">
-            <mat-select [(ngModel)]="form_courseid" name="form_courseid" (change)="report()">
-              <mat-option  *ngFor="let course of courses let i = index" [value]="i">{{course.fullname}}</mat-option>
-            </mat-select>
-          </mat-form-field>
-        </form>
       </div>
     </div>
-  </div>
+    <div *ngIf="!is_ready" fxLayoutAlign="center">
+      <h1>CARREGANDO...</h1>
+    </div>
+    <!-- /CONTENT  -->
 </div>

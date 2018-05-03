@@ -20,6 +20,7 @@ import { MoodleService } from './main/services/moodle.service';
 import { MoodleApiService } from './main/services/moodle-api.service';
 import { DataShareService } from './main/services/data-share.service';
 
+import { AuthGuard } from './main/guards/auth.guard';
 
 import { AngularFireModule  } from 'angularfire2';
 import { AngularFireAuthModule } from 'angularfire2/auth';
@@ -33,23 +34,37 @@ import { environment } from '../environments/environment';
 const appRoutes: Routes = [
   {
       path      : 'auth',
-      loadChildren: './main/content/auth/auth.module#AuthModule'
+      loadChildren: './main/content/auth/auth.module#AuthModule',
+      canActivate: [AuthGuard]
   },
   {
       path      : 'dashboard',
-      loadChildren: './main/content/components/dashboard/dashboard.module#DashboardModule'
+      loadChildren: './main/content/components/dashboard/dashboard.module#DashboardModule',
+      canActivate: [AuthGuard]
   },
   {
       path      : 'moodles',
-      loadChildren: './main/content/components/moodles/moodles.module#MoodlesModule'
+      loadChildren: './main/content/components/moodles/moodles.module#MoodlesModule',
+      canActivate: [AuthGuard]
   },
   {
       path      : 'courses',
-      loadChildren: './main/content/components/courses/courses.module#CoursesModule'
+      loadChildren: './main/content/components/courses/courses.module#CoursesModule',
+      canActivate: [AuthGuard]
+  },
+  {
+      path      : 'error',
+      loadChildren: './main/content/error/404/error-404.module#Error404Module',
+      canActivate: [AuthGuard]
   },
     {
+        path      : '',
+        redirectTo: 'auth/login',
+        pathMatch: 'full'
+    },
+    {
         path      : '**',
-        redirectTo: 'auth/login'
+        redirectTo: 'error/404'
     }
 ];
 
@@ -81,7 +96,8 @@ const appRoutes: Routes = [
       AuthService,
       MoodleService,
       MoodleApiService,
-      DataShareService
+      DataShareService,
+      AuthGuard
     ],
     bootstrap   : [
         AppComponent

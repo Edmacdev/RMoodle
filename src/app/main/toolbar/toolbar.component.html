@@ -49,7 +49,7 @@
                     <span>Inbox</span>
                 </button> -->
 
-                <button mat-menu-item class="">
+                <button mat-menu-item (click)="authService.signOut()">
                     <mat-icon>exit_to_app</mat-icon>
                     <span>Logout</span>
                 </button>

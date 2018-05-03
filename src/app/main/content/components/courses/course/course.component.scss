@@ -1,3 +1,7 @@
+mat-form-field{
+  min-width: 80px;
+  margin: 0 20px 0 20px;
+}
 .editable{
   outline: none;
   -webkit-appearance: none;
@@ -45,6 +49,7 @@ ul.countdown li p {
 .last { border-right: 1px solid #C0392B; }
 
 .info{
+
   margin-bottom: 150px;
   width: 100%
 }
@@ -108,4 +113,26 @@ ul.countdown li p {
 
   flex: 2;
   margin: 10px 25px 10px 0px;
+}
+.cards{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+.card{
+  width: 45% !important;
+  margin: 20px 20px;
+  padding: 24px 24px;
+}
+.user-info{
+  background-color: rgba(0,0,0,0)
+}
+.form-search{
+  margin: 50px 0 0 50px;
+}
+.usersList{
+  margin-top: 30px;
+  margin-bottom: 50px;
 }

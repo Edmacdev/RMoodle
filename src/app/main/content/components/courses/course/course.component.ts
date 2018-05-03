@@ -7,15 +7,17 @@ import { MoodleApiService } from 'app/main/services/moodle-api.service';
 
 import {MatTableDataSource, MatSort, MatPaginator} from '@angular/material';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 
 import { DisplayUsersDialogComponent } from '../../display-users-dialog/display-users-dialog.component';
 
 import { forkJoin } from 'rxjs/observable/forkJoin';
 import { Subject } from 'rxjs/Subject';
 
+import Chart from 'chart.js';
 import swal from 'sweetalert2';
 import * as $ from 'jquery';
-
+declare var Chart: any
 @Component({
   selector: 'app-course',
   templateUrl: './course.component.html',
@@ -31,7 +33,7 @@ export class CourseComponent implements OnInit {
     moodle: any;
   // COURSE
     courseid:string;
-    course: any;
+    course: any = {};
   //STATUS
     is_ready: boolean = false;
     is_course: boolean = false;
@@ -55,13 +57,32 @@ export class CourseComponent implements OnInit {
     @ViewChild(MatSort) sort: MatSort;
     @ViewChild('paginator') paginator: MatPaginator;
 
+  //ENROL USER TAB
+    form_ctrl = new FormControl();
+    fg_search_users: FormGroup;
+    form_opt: string = 'firstname';
+    form_opt_query: string = 'exact';
+    form_query: string ='';
+    options: string[] = ['id', 'nome', 'sobrenome', 'usuário', 'email'];
+    options_query: string[] = ['igual a', 'contém', 'contém antes', 'contém depois'];
+    users_list: any[] =[];
+    selected_users_for_enrollment: any[] = [];
+
   constructor(
     private route: ActivatedRoute,
     private authService: AuthService,
     private moodleService: MoodleService,
     private moodleApiService: MoodleApiService,
-    public dialog: MatDialog
-  ) { }
+    public dialog: MatDialog,
+    private fb: FormBuilder
+  ) {
+    this.fg_search_users = fb.group({
+      'qry':[null, Validators.compose([Validators.required, Validators.minLength(2), Validators.maxLength(30)])],
+      'opt':[null, Validators.required ],
+      'opt2':[null, Validators.required ]
+    });
+
+   }
 
   ngOnInit() {
     this.authService.getUser().subscribe(
@@ -77,8 +98,39 @@ export class CourseComponent implements OnInit {
                     this.courseid = params.courseid;
                     this.moodle = this.moodles.find((element)=>{return element.id == params.moodleid})
 
-                    this.getCourse();
-                    this.report();
+                    this.getCourse().subscribe(
+                      data => {
+                        if(data.errorcode){
+                          let errortext: string;
+                          switch(data.errorcode){
+                            case 'invalidtoken':
+                              errortext = 'O token registrado é inválido.';
+                            break
+                            default: errortext = 'Ocorreu um erro desconhecido'
+                          }
+                          swal({
+                            type: 'error',
+                            text: errortext
+                          })
+                          return false;
+                        }
+                        let result = data.sort((a,b) => a.fullname.localeCompare(b.fullname));
+                        this.course = result[0];
+
+                        this.is_course = true;
+
+                        this.report();
+                      },
+                      err => {
+                        if(err.status == 0){
+                          swal({
+                            type: 'error',
+                            text: 'O URL registrado não é válido.'
+                          })
+                        }
+                        else(console.log(err))
+                      }
+                    );
                   }
                 )
               }
@@ -88,43 +140,13 @@ export class CourseComponent implements OnInit {
       }
     )
   }
-  getCourse(): void{
+  getCourse(): any{
 
     const params: object ={
       wstoken: this.moodle.token,
       coursesid: '&options[ids][0]=' + this.courseid
     }
-    this.moodleApiService.core_course_get_courses(this.moodle.url, params).subscribe(
-      data => {
-        if(data.errorcode){
-          let errortext: string;
-          switch(data.errorcode){
-            case 'invalidtoken':
-              errortext = 'O token registrado é inválido.';
-            break
-            default: errortext = 'Ocorreu um erro desconhecido'
-          }
-          swal({
-            type: 'error',
-            text: errortext
-          })
-          return false;
-        }
-        let result = data.sort((a,b) => a.fullname.localeCompare(b.fullname));
-        this.course = result[0];
-        console.log(this.course);
-        this.is_course = true;
-      },
-      err => {
-        if(err.status == 0){
-          swal({
-            type: 'error',
-            text: 'O URL registrado não é válido.'
-          })
-        }
-        else(console.log(err))
-      }
-    )
+    return this.moodleApiService.core_course_get_courses(this.moodle.url, params)
   }
 
   report():void{
@@ -132,6 +154,9 @@ export class CourseComponent implements OnInit {
     this.is_loading = true;
     this.activities_status = [];
     this.course_status_array = [];
+    this.selected_users_for_enrollment = [];
+
+    this.is_course_finished = this.isCourseFinished();
 
     // STATUS
     var status: boolean[] = [false, false];
@@ -163,7 +188,6 @@ export class CourseComponent implements OnInit {
             ))
           this.is_ready = true;
           this.is_loading = false;
-
           setTimeout(
             () => {
               this.data_source.paginator = this.paginator;
@@ -231,7 +255,6 @@ export class CourseComponent implements OnInit {
                 }
                 forkJoin(this.activities_status).subscribe(
                   result => {
-                    console.log(result)
                     this.activities_status = result;
                     status_subject.next('usersActivitiesCompletion');
                   }
@@ -449,8 +472,8 @@ export class CourseComponent implements OnInit {
             err => {},
             () => {
               let dialogRef = this.dialog.open(DisplayUsersDialogComponent, {
-                width: '1500px',
-                height: '800px',
+                width: '800px',
+                height: '600px',
                 data: {
                   name: user.name,
                   grades: resultG,
@@ -466,8 +489,8 @@ export class CourseComponent implements OnInit {
         }
         else {
           let dialogRef = this.dialog.open(DisplayUsersDialogComponent,{
-            width: '1500px',
-            height: '800px',
+            width: '800px',
+            height: '600px',
             data: {
               name: name,
               grades: resultG,
@@ -479,5 +502,316 @@ export class CourseComponent implements OnInit {
       err => {console.log(err); return false},
     )
   }
+  unenrolUser(user){
+    swal({
+      title: 'Desmatricular usuário',
+      text: 'Tem certeza que deseja desmatricular o usuário ' + user.name+ '?',
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sim',
+      cancelButtonText: 'Não'
+    }).then((result) => {
 
+      if (result.value) {
+        let enrolments =
+          '&enrolments[0][roleid]=5'+
+          '&enrolments[0][userid]='+user.id +
+          '&enrolments[0][courseid]='+this.course.id
+
+        const params ={
+          wstoken: this.moodle.token,
+          enrolments: enrolments
+        }
+        this.moodleApiService.enrol_manual_unenrol_users(this.moodle.url, params).subscribe(
+          data => {
+            if(data == null){
+              var i;
+              this.data_source.data.find(
+                (element, index)=>{
+                  i = index;
+                  return element.id == user.id
+                }
+              )
+              swal(
+                '',
+                'Usuário desmatriculado',
+                'success'
+              )
+              this.report();
+            }
+            else{
+              swal(
+                '',
+                'Erro ao desmatricular usuário',
+                'error'
+              )
+            }
+          },
+          err => console.error(err)
+        );
+      }
+    })
+  }
+  tabChange(event):void{
+    //Caso a aba 'Gráficos seja escolhida'
+    if(event.index == 1){
+      if(this.is_course_finished){
+        //Renderiza apenas o gráfico de notas caso o curso tenha finalizado
+        this.chartRender('grades')
+        this.chartRender('progress')
+      }
+      else{
+        //Renderiza todos os gráficos caso o curso ainda esteja em andamento
+          this.chartRender('access')
+          this.chartRender('progress')
+          this.chartRender('grades')
+
+      }
+    }
+  }
+  chartRender(chart:string):void{
+    switch(chart){
+      case 'access':
+      var data1:number = 0;
+      var data2:number = 0;
+      var data3:number = 0;
+      var data4:number = 0;
+      var data5:number = 0;
+      var data6:number = 0;
+
+          var days = percentage => {
+            let courseDuration = Math.floor(this.courseTime(this.course).duration/(1000 * 60 * 60 * 24));
+            return Math.floor((percentage*courseDuration)/100);
+          }
+          data1 = this.data_source.data.filter(elem => elem.lastaccess/24 == null).length;
+          data2 = this.data_source.data.filter(elem => elem.lastaccess/24 < days(5)).length;
+          data3 = this.data_source.data.filter(elem => elem.lastaccess/24 >= days(5) && elem.lastaccess/24 < days(10) ).length;
+          data4 = this.data_source.data.filter(elem => elem.lastaccess/24 >= days(10) && elem.lastaccess/24 < days(25) ).length;
+          data5 = this.data_source.data.filter(elem => elem.lastaccess/24 >= days(25) && elem.lastaccess/24 < days(50) ).length;
+          data6 = this.data_source.data.filter(elem => elem.lastaccess/24 > days(50)).length;
+          var filter_access =  elem =>  elem.lastaccess = this;
+          var chtAccessCtx = $("#cht-access")[0].getContext('2d');
+          var chtAccess = new Chart(chtAccessCtx, {
+          type: 'bar',
+          data: {
+              labels: [
+                "nunca",
+                "menos de " + days(5) + " dias",
+                days(5) + "-" + days(10) + " dias",
+                days(10) + "-" + days(25) + " dias",
+                days(25) + "-" + days(50) + " dias",
+                "mais de " + days(50) + " dias"],
+              datasets: [{
+                  label: '',
+                  data: [data1, data2, data3, data4, data5, data6],
+                  backgroundColor: [
+                      'rgba(255, 99, 132, 0.2)',
+                      'rgba(54, 162, 235, 0.2)',
+                      'rgba(255, 206, 86, 0.2)',
+                      'rgba(218, 135, 76, 0.2)',
+                      'rgba(75, 192, 192, 0.2)',
+                      'rgba(128, 0, 128, 0.2)'
+                  ],
+                  borderColor: [
+                      'rgba(255,99,132,1)',
+                      'rgba(54, 162, 235, 1)',
+                      'rgba(255, 206, 86, 1)',
+                      'rgba(218, 135, 76, 1)',
+                      'rgba(75, 192, 192, 1)',
+                      'rgba(128, 0, 128, 1)'
+                  ],
+                  borderWidth: 1
+              }]
+          },
+          options: {
+          }
+          })
+
+    break
+    case 'progress':
+
+        data1 = this.data_source.data.filter(elem => elem.progress == 0).length;
+        data2 = this.data_source.data.filter(elem => elem.progress >= 1 && elem.progress <= 20).length;
+        data3 = this.data_source.data.filter(elem => elem.progress >= 21 && elem.progress <= 40).length;
+        data4 = this.data_source.data.filter(elem => elem.progress >= 41 && elem.progress <= 60).length;
+        data5 = this.data_source.data.filter(elem => elem.progress >= 61 && elem.progress <= 80).length;
+        data6 = this.data_source.data.filter(elem => elem.progress >= 81 && elem.progress <= 100).length;
+        let chtProgressCtx = $("#cht-progress")[0].getContext('2d');
+        let chtProgress = new Chart(chtProgressCtx, {
+        type: 'bar',
+        data: {
+            labels: ['sem progresso', '1-20%', '21-40%', '41-60%', '61-80%', '81-100%'],
+            datasets: [{
+                data: [data1, data2, data3, data4, data5, data6],
+                label: '',
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(218, 135, 76, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(128, 0, 128, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255,99,132,1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(218, 135, 76, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(128, 0, 128, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {}
+        })
+        break
+        case 'grades':
+        data1 = this.data_source.data.filter(elem => elem.grade == -1).length;
+        data2 = this.data_source.data.filter(elem => elem.grade >= 1 && elem.grade <= 20).length;
+        data3 = this.data_source.data.filter(elem => elem.grade >= 21 && elem.grade <= 40).length;
+        data4 = this.data_source.data.filter(elem => elem.grade >= 41 && elem.grade <= 60).length;
+        data5 = this.data_source.data.filter(elem => elem.grade >= 61 && elem.grade <= 80).length;
+        data6 = this.data_source.data.filter(elem => elem.grade >= 81 && elem.grade <= 100).length;
+        let chtGradesCtx = $("#cht-grades")[0].getContext('2d');
+        let chtGrades = new Chart(chtGradesCtx, {
+        type: 'bar',
+        data: {
+            labels: ["sem nota","0-20", "21-40","41-60", "61-80", "81-100"],
+            datasets: [{
+                label: '',
+                data: [data1, data2, data3, data4, data5, data6],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(218, 135, 76, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(128, 0, 128, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255,99,132,1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(218, 135, 76, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(128, 0, 128, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {}
+        })
+      break
+    }
+  }
+  isCourseFinished(): boolean{
+    let now = new Date().getTime();
+    let enddate = this.course.enddate * 1000
+
+    if( enddate - now < 0 ){
+
+      return true;
+
+    }
+    else {
+      return false;
+    }
+  }
+  //Busca usuários registrados no moodle que atendam aos critérios de pesquisa
+  getUsers(query, option, querycontext){
+    var params;
+    switch(querycontext){
+      case 'exact':
+      params = {
+        wstoken: this.moodle.token,
+        criteriakey: option,
+        criteriavalue: query
+      }
+      break
+      case 'include':
+      params = {
+        wstoken: this.moodle.token,
+        criteriakey: option,
+        criteriavalue: '%' + query + '%'
+      }
+      break
+      case 'includeafter':
+      params = {
+        wstoken: this.moodle.token,
+        criteriakey: option,
+        criteriavalue: query + '%'
+      }
+      break
+      case 'includebefore':
+      params ={
+        wstoken: this.moodle.token,
+        criteriakey: option,
+        criteriavalue: '%' + query
+      }
+      break
+    }
+    this.moodleApiService.core_user_get_users(this.moodle.url, params)
+      .subscribe(
+        data => {
+          this.users_list = data.users.sort((a,b) => a.fullname.localeCompare(b.fullname));
+        },
+        err => console.log(err)
+      )
+  }
+  checkUser(event, user){
+    if(event.selected){
+      this.selected_users_for_enrollment.push(user);
+    }
+    else{
+      var i;
+      this.selected_users_for_enrollment.find(
+        (element, index)=>{
+          i = index;
+          return element.id == user.id
+        })
+      this.selected_users_for_enrollment.splice(i,1);
+    }
+  }
+  enrolUsers(){
+    let enrolments: string ='';
+    for(let i in this.selected_users_for_enrollment){
+      let enrolment =
+      '&enrolments['+i+'][roleid]=5'+
+      '&enrolments['+i+'][userid]='+this.selected_users_for_enrollment[i].id +
+      '&enrolments['+i+'][courseid]='+this.course.id;
+      enrolments += enrolment
+    }
+
+    const params ={
+      wstoken: this.moodle.token,
+      enrolments: enrolments
+    }
+
+    this.moodleApiService.enrol_manual_enrol_users(this.moodle.url, params).subscribe(
+      data => {
+        if(data == null){
+
+          swal(
+            '',
+            'Usuário matriculado',
+            'success'
+          )
+          this.report()
+        }
+        else {
+          swal(
+            '',
+            'Ocorreu um erro',
+            'error'
+          )
+
+        }
+      },
+      err => console.error(err)
+    );
+  }
+  log(e){
+    console.log(e)
+  }
 }

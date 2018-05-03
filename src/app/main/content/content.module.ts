@@ -5,8 +5,6 @@ import { FuseSharedModule } from '@fuse/shared.module';
 
 import { FuseContentComponent } from 'app/main/content/content.component';
 
-import { MoodlesModule } from './components/moodles/moodles.module';
-
 
 @NgModule({
     declarations: [

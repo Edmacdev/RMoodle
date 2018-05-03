@@ -14,7 +14,7 @@
       </button>
 
       <div>
-          <h2>CURSO</h2>
+          <h2>{{course.displayname}}</h2>
       </div>
 
   </div>
@@ -25,13 +25,13 @@
 
   <div *ngIf="is_ready" class="p-24">
 
-      <div class="title" >
+      <!-- <div class="title" >
           <h2><input  class="editable input-title"value="{{course.fullname}}"></h2>
-      </div>
+      </div> -->
 
     <!-- COURSEINFO -->
 
-    <div class="course-info">
+    <div class="course-info fuse-card card p-12">
       <p>Alunos matriculados: {{enrolled_students.length}}</p>
       <p>Data de início: {{formatDate(course.startdate).getDate()}}-{{formatDate(course.startdate).getMonth()+1}}-{{formatDate(course.startdate).getFullYear()}}</p>
       <p>Data de Término: {{formatDate(course.enddate).getDate()}}-{{formatDate(course.enddate).getMonth()+1}}-{{formatDate(course.enddate).getFullYear()}}</p>
@@ -67,9 +67,10 @@
 
     <!-- /COUNTDOWN -->
 
-    <!-- TABS  COURSE FINISHED -->
+    <!-- TABS  COURSE NOT FINISHED -->
 
     <div class="icon-print" (click)="print()"><i class="material-icons">print</i></div>
+
     <div class="tabs"*ngIf="!is_course_finished">
         <mat-tab-group (selectedTabChange)="tabChange($event)">
 
@@ -197,207 +198,346 @@
               </div>
           </mat-tab>
 
-            <!-- STUDENTS TABLE LIST -->
+          <!-- STUDENTS TABLE LIST -->
 
-        <!-- <mat-tab label="Gráficos">
+          <!-- COURSE GRAPHS -->
+
+          <mat-tab label="Gráficos">
+
+            <div class="content" [ngClass]="this.view">
+
+              <!-- GRAPH CARDS -->
+
+              <div class="cards" fxLayoutAlign="center">
+
+                <!-- DAYS SINCE LAST ACCESS -->
+
+                <div class="fuse-card card cht-access-wrapper">
+
+                  <div class="h3 px-16 py-24">DIAS DESDE O ÚLTIMO ACESSO</div>
+                  <div class="chart h-800"><canvas id="cht-access"></canvas></div>
+
+                </div>
+
+                <!-- /DAYS SINCE LAST ACCESS -->
+
+                <!-- PROGRESS -->
+
+                <div class="fuse-card card cht-progress-wrapper">
+
+                  <div class="h3 px-16 py-24">PROGRESSO NAS ATIVIDADES</div>
+                  <div class="chart h-800"><canvas id="cht-progress"></canvas></div>
+
+                </div>
+
+                <!-- /PROGRESS -->
+
+                <!-- GRADES -->
+
+                <div class="fuse-card card cht-grades-wrapper">
+
+                  <div class="h3 px-16 py-24">NOTAS</div>
+                  <div class="chart h-800"><canvas id="cht-grades"></canvas></div>
+
+                </div>
+
+                <!-- /GRADES -->
+
+              </div>
+
+              <!-- /GRAPH CARDS -->
+
+            </div>
+
+          </mat-tab>
+
+          <!-- /COURSE GRAPHS -->
+
+          <!-- ENROL USERS -->
+
+          <mat-tab label="Matrícula">
+
+            <div class="form-search">
+
+              <h2 style="margin-right: 10px">Procurar usuários em que:</h2>
+
+              <!-- SEARCH USERS BY NAME, ID, EMAIL... -->
+
+              <mat-form-field class="mat-form" >
+                <mat-select  [(value)]="form_opt">
+                  <mat-option value="id"><h3>id</h3></mat-option>
+                  <mat-option value="firstname"><h3>nome</h3></mat-option>
+                  <mat-option value="lastname"><h3>sobrenome</h3></mat-option>
+                  <mat-option value="username"><h3>usuário</h3></mat-option>
+                  <mat-option value="email"><h3>email</h3></mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <!-- /SEARCH USERS BY NAME, ID, EMAIL... -->
+
+              <!-- SEARCH BY PART OR EXACT TERM -->
+
+              <mat-form-field class="mat-form" >
+                <mat-select  [(value)]="form_opt_query" name="form_opt_query">
+                  <mat-option value="exact"><h3>igual a</h3></mat-option>
+                  <mat-option value="include"><h3>contém</h3></mat-option>
+                  <mat-option value="icludebefore"><h3>contém antes</h3></mat-option>
+                  <mat-option value="includeafter"><h3>contem depois</h3></mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <!-- /SEARCH BY PART OR EXACT TERM -->
+
+              <!-- QUERY INPUT -->
+
+              <mat-form-field class="mat-form" >
+                <input  [(ngModel)]="form_query" matInput type="text" class="addText" placeholder="" value="">
+              </mat-form-field>
+
+              <!-- /QUERY INPUT -->
+
+              <!-- SEARCH BUTTON -->
+
+              <button mat-fab  (click)="getUsers(form_query,form_opt, form_opt_query)" color="accent"[disabled]="form_query == ''">Buscar</button>
+
+              <div class="usersList">
+
+              <!-- SEARCH RESULT TABLE LIST -->
+
+                <mat-selection-list #selectedUser >
+                  <mat-list-option *ngFor="let element of users_list"(selectionChange)='checkUser($event, element)'>
+                    <div class="user-element">
+                      <h4>{{element.fullname}}</h4>
+                      <p>{{element.email}}</p>
+                    </div>
+                  </mat-list-option>
+                </mat-selection-list>
+
+                <!-- /SEARCH RESULT TABLE LIST -->
+
+            </div>
+
+            <!-- ENROL BUTTON -->
+
+            <button mat-raised-button color="accent" (click)="enrolUsers()" [disabled]="selected_users_for_enrollment.length == 0">Matricular</button>
+
+            <!-- /ENROL BUTTON -->
+
+          </div>
+
+          </mat-tab>
+
+          <!-- /ENROL USERS -->
+
+        </mat-tab-group>
+
+    </div>
+
+    <!-- TABS COURSE NOT FINISHED -->
+
+    <!-- SEARCH USERS BY NAME, ID, EMAIL... -->
+
+    <!-- /SEARCH USERS BY NAME, ID, EMAIL... -->
+
+    <!-- TABS COURSE FINISHED -->
+
+    <div class="tabs" *ngIf="is_course_finished">
+
+      <mat-tab-group (selectedTabChange)="tabChange($event)">
+
+        <mat-tab label="Quadro Geral" id="tb-users">
+          <div class="info" >
+            <h2 style="text-align:center">RELATÓRIO FINAL</h2>
+            <!-- TABLE HEADER -->
+
+            <div class="table-header">
+               <mat-form-field class="filter">
+                 <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filtro">
+               </mat-form-field>
+             </div>
+
+             <!-- /TABLE HEADER -->
+
+             <!-- TABLE CONTENT -->
+
+            <mat-table #table [dataSource]="data_source" matSort>
+
+              <!-- NAME COLUMN -->
+
+              <ng-container matColumnDef="name" >
+                <mat-header-cell *matHeaderCellDef mat-sort-header class="col-name">  Nome </mat-header-cell>
+                <mat-cell *matCellDef="let element" class="col-name">
+                  <div >
+                    <div class="name">
+                      <input id="firstname{{element.id}}"(click)="setCurrentUserInfo(element.id, 'firstname')"type="text" class="editable user-info" value="{{element.firstname}}">
+                      <input id="lastname{{element.id}}"(click)="setCurrentUserInfo(element.id, 'lastname')"type="text" class="editable user-info" value="{{element.lastname}}">
+                    </div>
+                  </div>
+                </mat-cell>
+              </ng-container>
+
+              <!-- /NAME COLUMN -->
+
+              <!-- EMAIL COLUMN -->
+
+              <ng-container matColumnDef="email" >
+                <mat-header-cell *matHeaderCellDef mat-sort-header class="col-email"> Email </mat-header-cell>
+                <mat-cell *matCellDef="let element" class="col-email">
+                  <input id="email{{element.id}}"(click)="setCurrentUserInfo(element.id, 'email')"type="text" class="editable user-info" value="{{element.email}}">
+                </mat-cell>
+              </ng-container>
+
+              <!-- /EMAIL COLUMN -->
+
+              <!-- PHONE COLUMN -->
+
+              <ng-container matColumnDef="phone" class="user-info">
+                <mat-header-cell *matHeaderCellDef class="col-phone"> Telefone </mat-header-cell>
+                <mat-cell *matCellDef="let element" class="col-phone">
+                  {{element.phone}}
+                 </mat-cell>
+              </ng-container>
+
+              <!-- /PHONE COLUMN -->
+
+              <!-- RESULT COLUMN -->
+
+              <ng-container matColumnDef="result">
+                <mat-header-cell *matHeaderCellDef mat-sort-header class="col-result"> Resultado </mat-header-cell>
+                <mat-cell *matCellDef="let element" class="col-result"> {{element.result}} </mat-cell>
+              </ng-container>
+
+              <!-- /RESULT COLUMN -->
+
+              <!-- GRADE COLUMN -->
+
+              <ng-container matColumnDef="grade">
+                <mat-header-cell *matHeaderCellDef mat-sort-header class="col-grade">Nota </mat-header-cell>
+                <mat-cell *matCellDef="let element" class="col-grade"> {{element.grade}} </mat-cell>
+              </ng-container>
+
+              <!-- /GRADE COLUMN -->
+
+              <!-- OPTIONS COLUMN -->
+              <ng-container matColumnDef="options" >
+                <mat-header-cell *matHeaderCellDef class="col-options"><i class="material-icons">more_horiz</i></mat-header-cell>
+                <mat-cell *matCellDef="let element" class="col-options">
+                  <i class="material-icons icon" (click)="userReport(element)">content_paste</i>
+                  <i class="material-icons icon icon-remove-circle" (click)="unenrolUser(element)">remove_circle</i>
+                </mat-cell>
+              </ng-container>
+
+              <!-- /OPTIONS COLUMN -->
+
+              <mat-header-row *matHeaderRowDef="display_columns_result"></mat-header-row>
+              <mat-row *matRowDef="let row; columns: display_columns_result"  [style.background-color]="getRowColor(row.result)"></mat-row>
+
+            </mat-table>
+
+            <mat-paginator #paginator
+             [pageSize]="25"
+             [pageSizeOptions]="[5, 10, 25, 50, 100]"
+             [showFirstLastButtons]="true">
+            </mat-paginator>
+
+          </div>
+
+        </mat-tab>
+
+        <!-- COURSE GRAPHS -->
+
+        <mat-tab label="Gráficos">
 
           <div class="content" [ngClass]="this.view">
 
-            <div class="cards">
+            <!-- GRAPH CARDS -->
 
-              <div class="fuse-card card cht-access-wrapper">
+            <div class="cards" fxLayoutAlign="center">
 
-                <div class="h3 px-16 py-24">
-                    DIAS DESDE O ÚLTIMO ACESSO
-                </div>
+              <!-- GRADES -->
 
-                <div class="h-800">
-                    <div class="chart"><canvas id="cht-access"></canvas></div>
-                </div>
+              <div class="fuse-card card cht-grades-wrapper">
+
+                <div class="h3 px-16 py-24">NOTAS</div>
+                <div class="chart h-800"><canvas id="cht-grades"></canvas></div>
 
               </div>
+
+              <!-- /GRADES -->
+
+              <!-- PROGRESS -->
 
               <div class="fuse-card card cht-progress-wrapper">
 
-                <div class="h3 px-16 py-24">
-                    PROGRESSO NAS ATIVIDADES
-                </div>
-
-                <div class="h-800">
-                  <div class="chart"><canvas id="cht-progress"></canvas></div>
-                </div>
+                <div class="h3 px-16 py-24">PROGRESSO NAS ATIVIDADES</div>
+                <div class="chart h-800"><canvas id="cht-progress"></canvas></div>
 
               </div>
 
-              <div class="fuse-card card cht-progress-wrapper">
-
-                <div class="h3 px-16 py-24">
-                    NOTAS
-                </div>
-
-
-                <div class="h-800">
-                  <div class="chart"><canvas id="cht-grades"></canvas></div>
-                </div>
-
-              </div>
-
+              <!-- /PROGRESS -->
 
             </div>
+
+            <!-- /GRAPH CARDS -->
+
           </div>
+
         </mat-tab>
 
+        <!-- /COURSE GRAPHS -->
+
+
+        <!-- ENROL USERS -->
+
         <mat-tab label="Matrícula">
-          <form [formGroup]="fg_search_users">
-            Procurar usuários em que
+
+          <div class="form-search">
+
+            <h2 style="margin-right: 10px">Procurar usuários em que:</h2>
+
+            <!-- SEARCH USERS BY NAME, ID, EMAIL... -->
+
             <mat-form-field class="mat-form" >
-              <mat-select [(ngModel)]="form_opt" name="form_opt" [formControl]="form_ctrl">
-                <mat-option *ngFor="let option of options let i = index" [value]="i"><h3>{{option}}</h3></mat-option>
+              <mat-select  [(value)]="form_opt">
+                <mat-option value="id"><h3>id</h3></mat-option>
+                <mat-option value="firstname"><h3>nome</h3></mat-option>
+                <mat-option value="lastname"><h3>sobrenome</h3></mat-option>
+                <mat-option value="username"><h3>usuário</h3></mat-option>
+                <mat-option value="email"><h3>email</h3></mat-option>
               </mat-select>
             </mat-form-field>
-            <mat-form-field class="mat-form">
-              <mat-select [(ngModel)]="form_opt_query" name="form_opt_query" [formControl]="form_ctrl">
-                <mat-option *ngFor="let option of options_query let i = index" [value]="i"><h3>{{option}}</h3></mat-option>
+
+            <!-- /SEARCH USERS BY NAME, ID, EMAIL... -->
+
+            <!-- SEARCH BY PART OR EXACT TERM -->
+
+            <mat-form-field class="mat-form" >
+              <mat-select  [(value)]="form_opt_query" name="form_opt_query">
+                <mat-option value="exact"><h3>igual a</h3></mat-option>
+                <mat-option value="include"><h3>contém</h3></mat-option>
+                <mat-option value="icludebefore"><h3>contém antes</h3></mat-option>
+                <mat-option value="includeafter"><h3>contem depois</h3></mat-option>
               </mat-select>
             </mat-form-field>
+
+            <!-- /SEARCH BY PART OR EXACT TERM -->
+
+            <!-- QUERY INPUT -->
+
             <mat-form-field class="mat-form" >
-              <input formControlName="qry" [(ngModel)]="form_query" matInput type="text" class="addText" placeholder="" value="">
+              <input  [(ngModel)]="form_query" matInput type="text" class="addText" placeholder="" value="">
             </mat-form-field>
-            <div class="btn btn-primary" (click)="getUsers(form_query,form_opt)">Buscar</div>
-          </form>
-          <div class="usersList">
-            <mat-list role="list">
-              <mat-list-item *ngFor="let moodleUser of users_list" role="listitem">
-                <mat-checkbox (change)="checkUser($event, moodleUser)"></mat-checkbox>
-                <img [src]=moodleUser.profileimageurlsmall alt="">
-                <h3>{{moodleUser.fullname}} </h3> <p>{{moodleUser.email}}</p>
-                <mat-divider></mat-divider>
-              </mat-list-item>
-            </mat-list>
-            <div class="btn btn-primary"(click)="enrolUsers()">Matricular</div>
-          </div>
-        </mat-tab> -->
 
-        </mat-tab-group>
-    </div>
+            <!-- /QUERY INPUT -->
 
-      <!-- <div class="tabs" *ngIf="is_course_finished">
-        <mat-tab-group (selectedTabChange)="tabChange($event)">
-          <mat-tab label="Quadro Geral" id="tb-users">
-            <div class="container">
-              <div class="row">
-                <h2>RELATÓRIO FINAL</h2>
-                <div class="info col-md-12">
-                  <div class="example-header">
-                     <mat-form-field class="filter">
-                       <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filtro">
-                     </mat-form-field>
-                   </div>
-                  <mat-table #table [dataSource]="data_source" matSort>
-                    <ng-container matColumnDef="name" >
-                      <mat-header-cell *matHeaderCellDef mat-sort-header class="col-name">  Nome </mat-header-cell>
-                      <mat-cell *matCellDef="let element" class="col-name" >
-                        <div >
-                          <div class="name">
-                            <input id="firstname{{element.id}}"(click)="setCurrentUserInfo(element.id, 'firstname')"type="text" class="editable user-info" value="{{element.firstname}}">
-                          </div>
-                          <div class="name">
-                            <input id="lastname{{element.id}}"(click)="setCurrentUserInfo(element.id, 'lastname')"type="text" class="editable user-info" value="{{element.lastname}}">
-                          </div>
-                        </div>
-                      </mat-cell>
-                    </ng-container>
-                    <ng-container matColumnDef="email" >
-                      <mat-header-cell *matHeaderCellDef mat-sort-header class="col-email"> Email </mat-header-cell>
-                      <mat-cell *matCellDef="let element" class="col-email">
-                        <input id="email{{element.id}}"(click)="setCurrentUserInfo(element.id, 'email')"type="text" class="editable user-info" value="{{element.email}}">
-                      </mat-cell>
-                    </ng-container>
-                    <ng-container matColumnDef="phone" class="col-phone">
-                      <mat-header-cell *matHeaderCellDef class="col-phone"> Telefone </mat-header-cell>
-                      <mat-cell *matCellDef="let element" >
-                        {{element.phone}}
-                       </mat-cell>
-                    </ng-container>
-                    <ng-container matColumnDef="result">
-                      <mat-header-cell *matHeaderCellDef mat-sort-header class="col-result"> Resultado </mat-header-cell>
-                      <mat-cell *matCellDef="let element" class="col-result"> {{element.result}} </mat-cell>
-                    </ng-container>
-                    <ng-container matColumnDef="grade">
-                      <mat-header-cell *matHeaderCellDef mat-sort-header class="col-grade">Nota </mat-header-cell>
-                      <mat-cell *matCellDef="let element" class="col-grade"> {{element.grade}} </mat-cell>
-                    </ng-container>
-                    <ng-container matColumnDef="options" >
-                      <mat-header-cell *matHeaderCellDef class="col-options"><i class="material-icons">more_horiz</i></mat-header-cell>
-                      <mat-cell *matCellDef="let element" class="col-options">
-                        <i class="material-icons icon" (click)="userReport(element)">content_paste</i>
-                        <i class="material-icons icon icon-remove-circle" (click)="unenrolUser(element)">remove_circle</i>
-                      </mat-cell>
-                    </ng-container>
-                    <mat-header-row *matHeaderRowDef="display_columns_result"></mat-header-row>
-                    <mat-row *matRowDef="let row; columns: display_columns_result"  [style.background-color]="getRowColor(row.result)"></mat-row>
-                  </mat-table>
-                  <mat-paginator #paginator
-                   [pageSize]="25"
-                   [pageSizeOptions]="[5, 10, 25, 50, 100]"
-                   [showFirstLastButtons]="true">
-                  </mat-paginator>
-                </div>
-              </div>
-            </div>
-          </mat-tab>
-          <mat-tab label="Gráficos">
-            <div class="container">
-              <div class="row">
-                <div class="cards">
-                  <div class="fuse-card card cht-progress-wrapper">
+            <!-- SEARCH BUTTON -->
 
-                    <div class="h3 px-16 py-24">
-                        NOTAS
-                    </div>
+            <button mat-fab  (click)="getUsers(form_query,form_opt, form_opt_query)" color="accent"[disabled]="form_query == ''">Buscar</button>
 
-
-                    <div class="h-800">
-                      <div class="chart"><canvas id="cht-grades"></canvas></div>
-                    </div>
-
-                  </div>
-                  <div class="fuse-card card cht-progress-wrapper">
-
-                    <div class="h3 px-16 py-24">
-                        progresso
-                    </div>
-
-
-                    <div class="h-800">
-                      <div class="chart"><canvas id="cht-progress"></canvas></div>
-                    </div>
-
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          </mat-tab>
-          <mat-tab label="Matrícula">
-            <form [formGroup]="fg_search_users">
-              Procurar usuários em que
-              <mat-form-field class="mat-form" >
-                <mat-select [(ngModel)]="form_opt" name="form_opt" [formControl]="form_ctrl">
-                  <mat-option *ngFor="let option of options let i = index" [value]="i"><h3>{{option}}</h3></mat-option>
-                </mat-select>
-              </mat-form-field>
-              <mat-form-field class="mat-form">
-                <mat-select [(ngModel)]="form_opt_query" name="form_opt_query" [formControl]="form_ctrl">
-                  <mat-option *ngFor="let option of options_query let i = index" [value]="i"><h3>{{option}}</h3></mat-option>
-                </mat-select>
-              </mat-form-field>
-              <mat-form-field class="mat-form" >
-                <input formControlName="qry" [(ngModel)]="form_query" matInput type="text" class="addText" placeholder="" value="">
-              </mat-form-field>
-              <div class="btn btn-primary" (click)="getUsers(form_query,form_opt, form_opt_query)">Buscar</div>
-            </form>
             <div class="usersList">
+
+            <!-- SEARCH RESULT TABLE LIST -->
+
               <mat-selection-list #selectedUser >
                 <mat-list-option *ngFor="let element of users_list"(selectionChange)='checkUser($event, element)'>
                   <div class="user-element">
@@ -406,16 +546,30 @@
                   </div>
                 </mat-list-option>
               </mat-selection-list>
-              <button class="btn btn-primary" (click)="enrolUsers()"[disabled]="selected_users_for_enrollment.length == 0">Matricular</button>
 
-            </div>
-          </mat-tab>
-        </mat-tab-group>
-      </div> -->
+              <!-- /SEARCH RESULT TABLE LIST -->
+
+          </div>
+
+          <!-- ENROL BUTTON -->
+
+          <button mat-raised-button color="accent" (click)="enrolUsers()" [disabled]="selected_users_for_enrollment.length == 0">Matricular</button>
+
+          <!-- /ENROL BUTTON -->
+
+        </div>
+
+        </mat-tab>
+
+        <!-- /ENROL USERS -->
+
+      </mat-tab-group>
+
+    </div>
 
   </div>
 
-  <div *ngIf="is_loading">
+  <div *ngIf="is_loading" fxLayoutAlign="center">
     <div><h1>CARREGANDO...</h1></div>
   </div>
 </div>

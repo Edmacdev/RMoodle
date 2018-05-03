@@ -98,7 +98,7 @@ export class FuseToolbarComponent implements OnInit
     this.authService.user.subscribe(
       user => {
         this.user = user
-        console.log(this.user)
+
       }
     )
   }
@@ -110,7 +110,7 @@ export class FuseToolbarComponent implements OnInit
     search(value)
     {
         // Do your search here...
-        console.log(value);
+        
     }
 
     setLanguage(lang)

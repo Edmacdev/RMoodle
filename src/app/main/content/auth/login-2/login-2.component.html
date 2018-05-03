@@ -46,7 +46,7 @@
                     </mat-error>
                 </mat-form-field>
 
-                <div class="remember-forgot-password" fxLayout="row" fxLayout.xs="column"
+                <!-- <div class="remember-forgot-password" fxLayout="row" fxLayout.xs="column"
                      fxLayoutAlign="space-between center">
                     <mat-checkbox class="remember-me" aria-label="Remember Me">
                         Lembrar-me
@@ -55,10 +55,10 @@
                     <a class="forgot-password" [routerLink]="'/pages/auth/forgot-password-2'">
                         Esqueceu a senha?
                     </a>
-                </div>
+                </div> -->
 
                 <button mat-raised-button color="accent" class="submit-button" aria-label="LOGIN"
-                        [disabled]="loginForm.invalid">
+                        [disabled]="true">
                     LOGIN
                 </button>
 
@@ -74,16 +74,16 @@
                     Entrar usando o Google
                 </button>
 
-                <button mat-raised-button class="facebook">
+                <!-- <button mat-raised-button class="facebook">
                     Entrar usando o Facebook
-                </button>
+                </button> -->
 
             </div>
 
-            <div class="register" fxLayout="column" fxLayoutAlign="center center">
+            <!-- <div class="register" fxLayout="column" fxLayoutAlign="center center">
                 <span class="text">Não possui uma conta?</span>
                 <a class="link" [routerLink]="'/pages/auth/register-2'">Criar uma conta</a>
-            </div>
+            </div> -->
         </div>
     </div>
 </div>
