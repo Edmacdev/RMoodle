@@ -44,7 +44,7 @@ export class FuseLogin2Component implements OnInit
     {
         this.authService.getUser().subscribe(
           user => {
-            if(user){this.router.navigate(['dashboard']);}
+            if(user){this.router.navigate(['courses']);}
           }
         );
         this.loginForm = this.formBuilder.group({

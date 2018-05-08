@@ -15,7 +15,7 @@ export class DisplayUsersDialogComponent  {
     @Inject(MAT_DIALOG_DATA) public data: any) { }
 
 
-  ngOnInit(){console.log(this.data)}
+  ngOnInit(){}
 
   getCourseGrade(courseid){
     let courseGrade = this.data.grades.find((element) => {return element.courseid == courseid});

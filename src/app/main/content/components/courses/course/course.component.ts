@@ -118,7 +118,6 @@ export class CourseComponent implements OnInit {
                         this.course = result[0];
 
                         this.is_course = true;
-
                         this.report();
                       },
                       err => {
@@ -201,18 +200,18 @@ export class CourseComponent implements OnInit {
               //     }
               //   }
               // )
-              // $(".user-info").focusout(
-              //   (event) => {
-              //     this.changeUserInfoHandler(this.selected_user_info, event)
-              //   }
-              // )
-              // $(".user-info").keyup(
-              //   (event) =>{
-              //     if(event.which == 13){
-              //       this.changeUserInfoHandler(this.selected_user_info, event)
-              //     }
-              //   }
-              // )
+              $(".user-info").focusout(
+                (event) => {
+                  this.changeUserInfoHandler(this.selected_user_info, event)
+                }
+              )
+              $(".user-info").keyup(
+                (event) =>{
+                  if(event.which == 13){
+                    this.changeUserInfoHandler(this.selected_user_info, event)
+                  }
+                }
+              )
             },400
           )
         }
@@ -558,7 +557,7 @@ export class CourseComponent implements OnInit {
       if(this.is_course_finished){
         //Renderiza apenas o gráfico de notas caso o curso tenha finalizado
         this.chartRender('grades')
-        this.chartRender('progress')
+        // this.chartRender('progress')
       }
       else{
         //Renderiza todos os gráficos caso o curso ainda esteja em andamento
@@ -636,6 +635,7 @@ export class CourseComponent implements OnInit {
         data4 = this.data_source.data.filter(elem => elem.progress >= 41 && elem.progress <= 60).length;
         data5 = this.data_source.data.filter(elem => elem.progress >= 61 && elem.progress <= 80).length;
         data6 = this.data_source.data.filter(elem => elem.progress >= 81 && elem.progress <= 100).length;
+        console.log(data5, data6)
         let chtProgressCtx = $("#cht-progress")[0].getContext('2d');
         let chtProgress = new Chart(chtProgressCtx, {
         type: 'bar',
@@ -813,5 +813,89 @@ export class CourseComponent implements OnInit {
   }
   log(e){
     console.log(e)
+  }
+  eventDate(){
+    let eventdate = this.formatDate(this.course.enddate).getFullYear() +
+                            '-' + (this.formatDate(this.course.enddate).getMonth()+1) +
+                            '-' + this.formatDate(this.course.enddate).getDate();
+    return eventdate;
+  }
+  changeUserInfo(user:any, value:string){
+    const params ={
+      wstoken: this.moodle.token,
+      userid: user.id,
+      userinfo: "&users[0][" + user.type + "]=" + value
+    }
+    return this.moodleApiService.core_user_update_users(this.moodle.url, params);
+  }
+  //Armazena informações do usuário selecionado para alterar informações
+  setCurrentUserInfo(id, type){
+    const userInfo = {
+      id: id,
+      type: type
+    }
+    this.selected_user_info = userInfo;
+  }
+  changeUserInfoHandler(user, event){
+    var i;
+    var dataSourceUser = this.data_source.data
+      .find((element, index) => {
+        i = index;
+        return element.id == user.id;
+      })
+
+    if(event.target.value !=  dataSourceUser.firstname &&
+       event.target.value !=  dataSourceUser.lastname &&
+       event.target.value !=  dataSourceUser.email ){
+      swal({
+        title: 'Alterar Usuário',
+        text: 'Tem certeza de que quer alterar esta informação?',
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sim',
+        cancelButtonText: 'Não'
+      }).then((result) => {
+        if (result.value) {
+          this.changeUserInfo(user, event.target.value).subscribe(
+            data => {
+              if(data != null){
+                swal(
+                  '',
+                  'Erro ao atualizar usuário',
+                  'error'
+                )
+                if(user.type == 'firstname') $("#firstname"+user.id).val(dataSourceUser.firstname);
+                else if(user.type == 'lastname') $("#lastname"+user.id).val(dataSourceUser.lastname);
+                else if(user.type == 'email') $("#email"+user.id).val(dataSourceUser.email);
+              }
+              else{
+                if(user.type == 'firstname') this.data_source.data[i].firstname = $("#firstname"+user.id).val();
+                else if(user.type == 'lastname') this.data_source.data[i].lastname = $("#lastname"+user.id).val();
+                else if(user.type == 'email') this.data_source.data[i].email = $("#email"+user.id).val();
+                swal(
+                  '',
+                  'Usuário Atualizado!',
+                  'success'
+                )
+                this.report();
+              }
+            }
+          );
+        } else if (result.dismiss === swal.DismissReason.cancel) {
+          swal(
+            '',
+            'O usuário não foi atualizado',
+            'error'
+          )
+          if(user.type == 'firstname') $("#firstname"+user.id).val(dataSourceUser.firstname);
+          else if(user.type == 'lastname') $("#lastname"+user.id).val(dataSourceUser.lastname);
+          else if(user.type == 'email') $("#email"+user.id).val(dataSourceUser.email);
+
+        }
+      })
+    }
+  }
+  print(){
+    window.print();
   }
 }

@@ -25,47 +25,35 @@
 
   <div *ngIf="is_ready" class="p-24">
 
+    <div class="cards">
       <!-- <div class="title" >
           <h2><input  class="editable input-title"value="{{course.fullname}}"></h2>
       </div> -->
 
-    <!-- COURSEINFO -->
+      <!-- COURSEINFO -->
 
-    <div class="course-info fuse-card card p-12">
-      <p>Alunos matriculados: {{enrolled_students.length}}</p>
-      <p>Data de início: {{formatDate(course.startdate).getDate()}}-{{formatDate(course.startdate).getMonth()+1}}-{{formatDate(course.startdate).getFullYear()}}</p>
-      <p>Data de Término: {{formatDate(course.enddate).getDate()}}-{{formatDate(course.enddate).getMonth()+1}}-{{formatDate(course.enddate).getFullYear()}}</p>
-      <p *ngFor="let teacher of enrolled_teachers">Proferssor: {{teacher.fullname}}</p>
+      <div class="course-info fuse-card card-info p-12">
+        <p>Alunos matriculados: {{enrolled_students.length}}</p>
+        <p>Data de início: {{formatDate(course.startdate).getDate()}}-{{formatDate(course.startdate).getMonth()+1}}-{{formatDate(course.startdate).getFullYear()}}</p>
+        <p>Data de Término: {{formatDate(course.enddate).getDate()}}-{{formatDate(course.enddate).getMonth()+1}}-{{formatDate(course.enddate).getFullYear()}}</p>
+        <p *ngFor="let teacher of enrolled_teachers">Proferssor: {{teacher.fullname}}</p>
+      </div>
+
+      <!-- /COURSEINFO -->
+
+      <!-- COUNTDOWN -->
+      <div class="fuse-card card-info p-12" >
+        <p *ngIf="!is_course_finished"fxLayout="row" fxLayoutAlign="center center">
+          <fuse-countdown eventDate="{{eventDate()}}"></fuse-countdown>
+        </p>
+
+        <div *ngIf="is_course_finished"fxLayout="row" fxLayoutAlign="center center">
+          <h2>CURSO ENCERRADO</h2>
+        </div>
+      </div>
+
+      <!-- /COUNTDOWN -->
     </div>
-
-    <!-- /COURSEINFO -->
-
-    <!-- COUNTDOWN -->
-
-    <!-- <div *ngIf="course"class="countdown-wrapper">
-
-      <ul class="countdown">
-        <li>
-          <span class="days">00</span>
-          <p class="days_ref">Dias</p>
-        </li>
-        <li>
-          <span class="hours">00</span>
-          <p class="hours_ref">Horas</p>
-        </li>
-        <li>
-          <span class="minutes">00</span>
-          <p class="minutes_ref">Minutos</p>
-        </li>
-        <li>
-          <span class="seconds last">00</span>
-          <p class="seconds_ref">Segundos</p>
-        </li>
-      </ul>
-      <div class="course-end col-md-6 col-md-offset-3"></div>
-    </div> -->
-
-    <!-- /COUNTDOWN -->
 
     <!-- TABS  COURSE NOT FINISHED -->
 
@@ -467,12 +455,12 @@
 
               <!-- PROGRESS -->
 
-              <div class="fuse-card card cht-progress-wrapper">
+              <!-- <div class="fuse-card card cht-progress-wrapper">
 
                 <div class="h3 px-16 py-24">PROGRESSO NAS ATIVIDADES</div>
                 <div class="chart h-800"><canvas id="cht-progress"></canvas></div>
 
-              </div>
+              </div> -->
 
               <!-- /PROGRESS -->
 
@@ -515,7 +503,7 @@
               <mat-select  [(value)]="form_opt_query" name="form_opt_query">
                 <mat-option value="exact"><h3>igual a</h3></mat-option>
                 <mat-option value="include"><h3>contém</h3></mat-option>
-                <mat-option value="icludebefore"><h3>contém antes</h3></mat-option>
+                <mat-option value="includebefore"><h3>contém antes</h3></mat-option>
                 <mat-option value="includeafter"><h3>contem depois</h3></mat-option>
               </mat-select>
             </mat-form-field>

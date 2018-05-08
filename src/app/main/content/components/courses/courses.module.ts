@@ -8,10 +8,12 @@ import { CourseComponent } from './course/course.component';
 
 import { MatDialogModule, MatExpansionModule, MatIconModule, MatInputModule, MatButtonModule,
           MatTableModule, MatSortModule, MatPaginatorModule, MatSelectModule,
-        MatTabsModule, MatCheckboxModule, MatListModule} from '@angular/material';
+        MatTabsModule, MatCheckboxModule, MatListModule, MatRadioModule} from '@angular/material';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FuseCountdownModule } from '@fuse/components';
 
 import { DisplayUsersDialogComponent } from '../display-users-dialog/display-users-dialog.component';
+import { DisplayMoodlesDialogComponent } from '../display-moodles-dialog/display-moodles-dialog.component';
 
 import { HttpModule } from '@angular/http';
 
@@ -30,7 +32,8 @@ const routes = [
   declarations:[
     ReportComponent,
     CourseComponent,
-    DisplayUsersDialogComponent
+    DisplayUsersDialogComponent,
+    DisplayMoodlesDialogComponent
   ],
   imports     :[
     RouterModule.forChild(routes),
@@ -50,10 +53,13 @@ const routes = [
     MatCheckboxModule,
     MatListModule,
     HttpModule,
-    MatIconModule
+    MatIconModule,
+    MatRadioModule,
+    FuseCountdownModule
   ],
   entryComponents:[
-    DisplayUsersDialogComponent
+    DisplayUsersDialogComponent,
+    DisplayMoodlesDialogComponent
   ]
 })
 export class CoursesModule

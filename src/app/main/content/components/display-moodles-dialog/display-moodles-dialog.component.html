@@ -1,0 +1,16 @@
+<div >
+  <h2 mat-dialog-title>Escolha o Moodle</h2>
+  <hr>
+  <mat-dialog-content>
+    <mat-radio-group class="example-radio-group" [(ngModel)]="selectedMoodle" (change)="is_moodle_selected = true">
+      <mat-radio-button class="example-radio-button" *ngFor="let moodle of data" [value]="moodle.id">
+        {{moodle.name}}
+      </mat-radio-button>
+    </mat-radio-group>
+  </mat-dialog-content>
+  <hr>
+  <mat-dialog-actions>
+    <button mat-raised-button color="accent" (click)="onCloseConfirm()" [disabled]="!is_moodle_selected">Confirmar</button>
+    <button mat-raised-button color="warn" (click)="onCloseCancel()" >Cancelar</button>
+  </mat-dialog-actions>
+</div>

@@ -3,6 +3,9 @@ import { AuthService } from 'app/main/services/auth.service';
 import { MoodleService } from 'app/main/services/moodle.service';
 import { MoodleApiService } from 'app/main/services/moodle-api.service';
 
+import { DisplayMoodlesDialogComponent } from '../../display-moodles-dialog/display-moodles-dialog.component';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+
 import swal from 'sweetalert2';
 
 declare var Chart: any
@@ -23,7 +26,7 @@ export class ReportComponent implements OnInit {
 //COURSES
   courses: any = [];
   filtered_courses: any = [];
-  search_term: string = [];
+  search_term: string = '';
 //STATUS
   is_courses: boolean = false;
   is_ready: boolean = false;
@@ -33,7 +36,8 @@ export class ReportComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private moodleService: MoodleService,
-    private moodleApiService: MoodleApiService
+    private moodleApiService: MoodleApiService,
+    public dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -68,6 +72,8 @@ export class ReportComponent implements OnInit {
   }
   //função que busca os cursos de um determinado Moodle
   getCourses():void{
+    this.is_ready = false;
+    this.is_courses = false;
     const params:object = {
       wstoken: this.current_moodle.token,
       coursesid: ''
@@ -90,7 +96,7 @@ export class ReportComponent implements OnInit {
         }
         else if(data.length > 0){
           this.courses = data.sort((a,b) => a.fullname.localeCompare(b.fullname));
-          this.filteredCourses = this.courses;
+          this.filtered_courses = this.courses;
           this.is_courses = true;
         }
         this.is_ready = true;
@@ -112,16 +118,37 @@ export class ReportComponent implements OnInit {
       token: this.current_moodle.token
     }
   }
-  filterCoursesByTerm()
-    {
+  filterCoursesByTerm(){
         const search_term = this.search_term.toLowerCase();
 
         // Search
         if ( search_term != '' )
         {
-          this.filteredCourses = this.courses.filter((course) => {
+          this.filtered_courses = this.courses.filter((course) => {
             return course.displayname.toLowerCase().includes(search_term);
           });
         }
     }
+  moodlesDialog(){
+    let dialogRef = this.dialog.open(
+      DisplayMoodlesDialogComponent,
+      {
+        width: '300px',
+        height: '350px',
+        disableClose: true,
+        data: this.moodles
+      }
+    )
+    dialogRef.afterClosed().subscribe(
+      result => {
+        if(result != 'Cancel'){
+          let moodle = this.moodles.find(
+            (element) => {return element.id == result;}
+          )
+          this.current_moodle = moodle;
+          this.getCourses();
+        }
+      }
+    )
+  }
 }
