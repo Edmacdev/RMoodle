@@ -68,4 +68,8 @@ export class MoodleService {
       }
     )
   }
+  removeDefaultMoodle(uid: string){
+    const userRef: AngularFirestoreDocument<Moodle> = this.afStore.doc('Usuários/' + uid + '/DefaultMoodle/' + 'moodle');
+    return userRef.delete();
+  }
 }

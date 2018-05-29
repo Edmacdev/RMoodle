@@ -127,6 +127,17 @@ export class MoodlesComponent {
           this.moodleService.removeMoodle(this.user.uid, moodle.id)
           .then(
             () => {
+              if( this.moodles.length == 0){
+                this.moodleService.removeDefaultMoodle(this.user.uid).then();
+              }
+              else {
+                let defaultMoodle = this.moodles.find(
+                  (element) => { return element.id == this.defaultMoodle.id }
+                  )
+                if ( defaultMoodle == undefined ){
+                  this.moodleService.setDefaultMoodle(this.user.uid, this.moodles[0])
+                }
+              }
               swal('Moodle Excluido', '', 'success')
             }
           )
@@ -159,6 +170,11 @@ export class MoodlesComponent {
         )
       }
     })
+  }
+  autoSetDefaultMoodle(){
+    if (this.moodles.length !== 0){
+      let isDefault
+    }
   }
   //material
   setStep(index: number) {

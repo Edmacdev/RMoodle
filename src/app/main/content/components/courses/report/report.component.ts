@@ -52,8 +52,10 @@ export class ReportComponent implements OnInit {
                 this.moodles = moodles;
                 this.moodleService.getDefaultMoodle(this.user.uid).subscribe(
                   data => {
-                    this.current_moodle = data[0];
-                    this.getCourses()
+                    if(data.length !== 0){
+                      this.current_moodle = data[0];
+                      this.getCourses();
+                    }
                   }
                 )
               }
